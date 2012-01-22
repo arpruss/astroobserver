@@ -166,7 +166,7 @@ public class DynamicStarMapActivity extends Activity implements OnSharedPreferen
   private Animation flashAnimation;
   private ActivityLightLevelManager activityLightLevelManager;
   private long sessionStartTime;
-private boolean haveOrientationSensors;
+  private boolean haveOrientationSensors;
 
   @Override
   public void onCreate(Bundle icicle) {
@@ -192,13 +192,19 @@ private boolean haveOrientationSensors;
                                                         sharedPreferences,
                                                         getResources(),
                                                         this);
-    initializeModelViewController();
-    
     haveOrientationSensors = SensorOrientationController.haveOrientationSensors(this);
-    if (!haveOrientationSensors)
+
+    initializeModelViewController();
+
+    if (!haveOrientationSensors) {
+        Log.d(TAG, "onCreate: no orientation sensors");
     	setAutoMode(false);
-    else
+    	sharedPreferences.edit().putBoolean(AUTO_MODE_PREF_KEY, false).commit();
+    }
+    else {
+        Log.d(TAG, "onCreate: have orientation sensors");
     	setAutoMode(sharedPreferences.getBoolean(AUTO_MODE_PREF_KEY, true));
+    }	
 
     // Search related
     setDefaultKeyMode(DEFAULT_KEYS_SEARCH_LOCAL);
@@ -522,6 +528,7 @@ private boolean haveOrientationSensors;
   }
 
   private void setAutoMode(boolean auto) {
+    Log.d(TAG, "setAutoMode "+auto);
     controller.setAutoMode(auto);
   }
 
