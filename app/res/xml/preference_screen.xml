@@ -106,11 +106,5 @@
         android:title="@string/allow_rotation_pref"
         android:summary="@string/allow_rotation_pref_desc"
         android:key="allow_rotation"/>
-    <!-- Keep in sync with value in utils.Analytics -->
-    <CheckBoxPreference
-        android:defaultValue="true"
-        android:title="@string/enable_analytics"
-        android:summary="@string/enable_analytics_desc"
-        android:key="enable_analytics"/>
   </PreferenceCategory>
 </PreferenceScreen>

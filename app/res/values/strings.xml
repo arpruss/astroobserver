@@ -59,7 +59,7 @@
     <string name="dialog_accept"  translation_description="accepting the licence agreement">Accept</string>
     <string name="dialog_decline" translation_description="declining the licence agreement">No Thanks</string>
     <string name="menu_help"  translation_description="menu item to show \'Help\' box">Help</string>
-    <string name="help_dialog_title">Help for Sky Map</string>
+    <string name="help_dialog_title">Help for Astro Observer</string>
     <string name="eula_dialog_title">End User License Agreement</string>
     <string name="set_manual">Switching to manual mode</string>
     <string name="set_auto">Switching to automatic mode</string>
@@ -116,7 +116,7 @@
     <string name="menu_gallery">Gallery</string>
     <string name="gallery_image_search_btn">Find in sky</string>
     <string name="gallery_image_back_btn">Back to gallery</string>
-    <string name="hubble_image_gallery_title">Sky Map Hubble Gallery</string>
+    <string name="hubble_image_gallery_title">Astro Observer Hubble Gallery</string>
     <string name="hubble_image">Hubble Image</string><!--  TODO(johntaylor): currently unused -->
 
     <string name="search_target_found_message" translation_description="displayed when a search target has been located">You found:</string>
@@ -404,7 +404,7 @@
     <string name="load_kml_dialog_title">Load KML</string>
     <string name="load_kml_file">Load</string>
     <string name="enable_analytics">Send usage statistics</string>
-    <string name="enable_analytics_desc">Make Sky Map better by sending anonymous data to Google Analytics</string>
+    <string name="enable_analytics_desc">Make Astro Observer better by sending anonymous data to Google Analytics</string>
     <string name="leonids" translation_description="Meteor Shower">Leonids</string>
     <string name="geminids" translation_description="Meteor Shower">Geminids</string>
     <string name="quadrantids" translation_description="Meteor Shower">Quadrantids</string>
