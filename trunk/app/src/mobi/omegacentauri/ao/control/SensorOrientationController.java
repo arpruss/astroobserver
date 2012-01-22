@@ -21,6 +21,7 @@ import mobi.omegacentauri.ao.util.smoothers.PlainSmootherModelAdaptor;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
+import android.hardware.Sensor;
 import android.hardware.SensorListener;
 import android.hardware.SensorManager;
 import android.preference.PreferenceManager;
@@ -74,6 +75,12 @@ public class SensorOrientationController extends AbstractController
   private PlainSmootherModelAdaptor modelAdaptor;
 
   private SharedPreferences sharedPreferences;
+  
+  public static boolean haveOrientationSensors(Context context) {
+	  SensorManager m = (SensorManager)context.getSystemService(Context.SENSOR_SERVICE); 
+	  return m.getSensorList(Sensor.TYPE_MAGNETIC_FIELD).size() > 0 &&
+	  		m.getSensorList(Sensor.TYPE_ACCELEROMETER).size() > 0;
+  }
 
   public SensorOrientationController(Context context) {
     manager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);

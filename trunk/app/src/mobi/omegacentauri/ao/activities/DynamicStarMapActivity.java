@@ -23,6 +23,7 @@ import mobi.omegacentauri.ao.control.AstronomerModel;
 import mobi.omegacentauri.ao.control.AstronomerModel.Pointing;
 import mobi.omegacentauri.ao.control.ControllerGroup;
 import mobi.omegacentauri.ao.control.MagneticDeclinationCalculatorSwitcher;
+import mobi.omegacentauri.ao.control.SensorOrientationController;
 import mobi.omegacentauri.ao.kml.KmlManager;
 import mobi.omegacentauri.ao.layers.LayerManager;
 import mobi.omegacentauri.ao.renderer.RendererController;
@@ -165,6 +166,7 @@ public class DynamicStarMapActivity extends Activity implements OnSharedPreferen
   private Animation flashAnimation;
   private ActivityLightLevelManager activityLightLevelManager;
   private long sessionStartTime;
+private boolean haveOrientationSensors;
 
   @Override
   public void onCreate(Bundle icicle) {
@@ -191,7 +193,12 @@ public class DynamicStarMapActivity extends Activity implements OnSharedPreferen
                                                         getResources(),
                                                         this);
     initializeModelViewController();
-    setAutoMode(sharedPreferences.getBoolean(AUTO_MODE_PREF_KEY, true));
+    
+    haveOrientationSensors = SensorOrientationController.haveOrientationSensors(this);
+    if (!haveOrientationSensors)
+    	setAutoMode(false);
+    else
+    	setAutoMode(sharedPreferences.getBoolean(AUTO_MODE_PREF_KEY, true));
 
     // Search related
     setDefaultKeyMode(DEFAULT_KEYS_SEARCH_LOCAL);
@@ -569,20 +576,29 @@ public class DynamicStarMapActivity extends Activity implements OnSharedPreferen
         }
       });
     }
-    final ButtonLayerView manualButtonLayer = (ButtonLayerView) findViewById(R.id.layer_manual_auto_toggle);
-    final WidgetFader manualControlFader = new WidgetFader(manualButtonLayer);
-    manualButtonLayer.hide();
-    final ImageButton manualAuto = (ImageButton) findViewById(R.id.manual_auto_toggle);
-    manualAuto.setOnClickListener(new OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        manualControlFader.keepActive();
-      }
-    });
+    
+    WidgetFader[] faders;
+    
+    if (haveOrientationSensors) {
+        final ButtonLayerView manualButtonLayer = (ButtonLayerView) findViewById(R.id.layer_manual_auto_toggle);
+	    final WidgetFader manualControlFader = new WidgetFader(manualButtonLayer);
+	    manualButtonLayer.hide();
+	    final ImageButton manualAuto = (ImageButton) findViewById(R.id.manual_auto_toggle);
+	    manualAuto.setOnClickListener(new OnClickListener() {
+	      @Override
+	      public void onClick(View v) {
+	        manualControlFader.keepActive();
+	      }
+	    });
+	    faders = new WidgetFader[] {manualControlFader, layerControlFader, zoomControlFader};
+    }
+    else {
+	    faders = new WidgetFader[] {layerControlFader, zoomControlFader};    	
+    }
 
     MapMover mapMover = new MapMover(model, controller, this, sharedPreferences);
     gestureDetector = new GestureDetector(new GestureInterpreter(
-        new WidgetFader[] {manualControlFader, layerControlFader, zoomControlFader},
+        faders,
         mapMover));
     dragZoomRotateDetector = new DragRotateZoomGestureDetector(mapMover);
   }
