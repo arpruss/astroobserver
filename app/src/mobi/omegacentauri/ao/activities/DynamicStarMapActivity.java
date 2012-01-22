@@ -579,10 +579,12 @@ private boolean haveOrientationSensors;
     
     WidgetFader[] faders;
     
+    final ButtonLayerView manualButtonLayer = (ButtonLayerView) findViewById(R.id.layer_manual_auto_toggle);
+    manualButtonLayer.hide();
+
     if (haveOrientationSensors) {
-        final ButtonLayerView manualButtonLayer = (ButtonLayerView) findViewById(R.id.layer_manual_auto_toggle);
+        Log.d(TAG, "have orientation sensors");
 	    final WidgetFader manualControlFader = new WidgetFader(manualButtonLayer);
-	    manualButtonLayer.hide();
 	    final ImageButton manualAuto = (ImageButton) findViewById(R.id.manual_auto_toggle);
 	    manualAuto.setOnClickListener(new OnClickListener() {
 	      @Override
@@ -593,6 +595,7 @@ private boolean haveOrientationSensors;
 	    faders = new WidgetFader[] {manualControlFader, layerControlFader, zoomControlFader};
     }
     else {
+        Log.d(TAG, "no orientation sensors");
 	    faders = new WidgetFader[] {layerControlFader, zoomControlFader};    	
     }
 
