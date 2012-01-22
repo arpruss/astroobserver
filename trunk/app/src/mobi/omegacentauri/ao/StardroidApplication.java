@@ -82,28 +82,7 @@ public class StardroidApplication extends Application {
     Resources resources = this.getResources();
     // Start the LayerManager initializing
     getLayerManager(assetManager, preferences, resources, this);
-
-    setUpAnalytics(versionName, preferences);
-
     Log.d(TAG, "StardroidApplication: -onCreate");
-  }
-
-  private void setUpAnalytics(String versionName, SharedPreferences preferences) {
-
-    String previousVersion = preferences.getString(PREVIOUS_APP_VERSION_PREF, NONE);
-    if (previousVersion.equals(NONE)) {
-      // It's possible a previous version exists, it's just that it wasn't a recent enough
-      // version to have set PREVIOUS_APP_VERSION_PREF.  If so, we should see that the TOS
-      // have been accepted.
-      if (preferences.contains(DynamicStarMapActivity.READ_TOS_PREF)) {
-        previousVersion = UNKNOWN;
-      }
-    }
-    preferences.edit().putString(PREVIOUS_APP_VERSION_PREF, versionName).commit();
-    if (!previousVersion.equals(versionName)) {
-      // It's either an upgrade or a new installation
-      Log.d(TAG, "New installation: version " + versionName);
-    }
   }
 
   @Override

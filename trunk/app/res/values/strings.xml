@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Please add  translation_description="" attributes to Strings to assist the translators. -->
 <resources>
-    <string name="app_name" translation_description="Application Title">Astro Observer</string>
+    <string name="app_name" translation_description="Application Title">Open Star Map</string>
     <string name="license_title">License information</string>
     <string name="show_license">View license information</string>
-    <string name="license">Copyright 2008-11 Google, Inc. and 2012 Omega Centauri<br/> Licensed under the Apache License, Version 2.0 (the "License");
+    <string name="license">Copyright 2008-11 Google, Inc. and 2012 Omega Centauri&lt;br/&gt;
+    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at<br/>
-       http://www.apache.org/licenses/LICENSE-2.0.<br/>
+   You may obtain a copy of the License at&lt;br/&gt;
+       http://www.apache.org/licenses/LICENSE-2.0.&lt;br/&gt;
    Unless required by applicable law or agreed to in writing, software
    distributed under the License is distributed on an "AS IS" BASIS,
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -59,7 +60,7 @@
     <string name="dialog_accept"  translation_description="accepting the licence agreement">Accept</string>
     <string name="dialog_decline" translation_description="declining the licence agreement">No Thanks</string>
     <string name="menu_help"  translation_description="menu item to show \'Help\' box">Help</string>
-    <string name="help_dialog_title">Help for Astro Observer</string>
+    <string name="help_dialog_title">Help for Sky Chart</string>
     <string name="eula_dialog_title">End User License Agreement</string>
     <string name="set_manual">Switching to manual mode</string>
     <string name="set_auto">Switching to automatic mode</string>
@@ -152,7 +153,7 @@
     <string name="sn1987a" translation_description="hubble object">Supernova 1987a</string>
     <string name="hubble_deep_field" translation_description="hubble object">Hubble Deep Field</string>
     <string name="rho_oph" translation_description="hubble object">Rho Ophiuchus</string>
-    <string name="menu_tos">Terms of Service</string>
+    <string name="menu_tos">License Information</string>
     <!-- TODO(johntaylor): the following might be deleted in favor of an icon -->
     <string name="control_panel_btn" translation_description="Label for the control panel button">Control Panel</string>
     <string name="allow_rotation_pref" translation_description="preference to enable rotation of the map with a two finger movement">Multitouch rotation</string>
