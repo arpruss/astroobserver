@@ -34,7 +34,6 @@ import mobi.omegacentauri.ao.touch.GestureInterpreter;
 import mobi.omegacentauri.ao.touch.MapMover;
 import mobi.omegacentauri.ao.units.GeocentricCoordinates;
 import mobi.omegacentauri.ao.units.Vector3;
-import mobi.omegacentauri.ao.util.Analytics;
 import mobi.omegacentauri.ao.util.MathUtil;
 import mobi.omegacentauri.ao.util.MiscUtil;
 import mobi.omegacentauri.ao.util.OsVersions;
@@ -178,10 +177,10 @@ public class DynamicStarMapActivity extends Activity implements OnSharedPreferen
     sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
     sharedPreferences.registerOnSharedPreferenceChangeListener(this);
 
-    boolean eulaConfirmed = sharedPreferences.getBoolean(READ_TOS_PREF, false);
-    if (!eulaConfirmed) {
-      showDialog(DialogFactory.DIALOG_EULA_WITH_BUTTONS);
-    }
+//    boolean eulaConfirmed = sharedPreferences.getBoolean(READ_TOS_PREF, false);
+//    if (!eulaConfirmed) {
+//      showDialog(DialogFactory.DIALOG_EULA_WITH_BUTTONS);
+//    }
 
     getWindow().setFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON,
         WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -192,13 +191,7 @@ public class DynamicStarMapActivity extends Activity implements OnSharedPreferen
                                                         getResources(),
                                                         this);
     initializeModelViewController();
-    // We want to reset to auto mode on every restart, as users seem to get
-    // stuck in manual mode and can't find their way out.
-    // TODO(johntaylor): this is a bit of an abuse of the prefs system, but
-    // the button we use is wired into the preferences system.  Should probably
-    // change this to a use a different mechanism.
-    sharedPreferences.edit().putBoolean(AUTO_MODE_PREF_KEY, true).commit();
-    setAutoMode(true);
+    setAutoMode(sharedPreferences.getBoolean(AUTO_MODE_PREF_KEY, true));
 
     // Search related
     setDefaultKeyMode(DEFAULT_KEYS_SEARCH_LOCAL);
@@ -272,20 +265,14 @@ public class DynamicStarMapActivity extends Activity implements OnSharedPreferen
     switch (item.getItemId()) {
       case R.id.menu_item_search:
         Log.d(TAG, "Search");
-        Analytics.getInstance(this).trackEvent(Analytics.USER_ACTION_CATEGORY,
-            Analytics.MENU_ITEM, Analytics.SEARCH_REQUESTED_LABEL, 1);
         onSearchRequested();
         break;
       case R.id.menu_item_settings:
         Log.d(TAG, "Settings");
-        Analytics.getInstance(this).trackEvent(Analytics.USER_ACTION_CATEGORY,
-            Analytics.MENU_ITEM, Analytics.SETTINGS_OPENED_LABEL, 1);
         startActivity(new Intent(this, EditSettingsActivity.class));
         break;
       case R.id.menu_item_help:
         Log.d(TAG, "Help");
-        Analytics.getInstance(this).trackEvent(Analytics.USER_ACTION_CATEGORY,
-            Analytics.MENU_ITEM, Analytics.HELP_OPENED_LABEL, 1);
         showDialog(DialogFactory.DIALOG_ID_HELP);
         break;
       case R.id.menu_item_dim:
@@ -293,13 +280,9 @@ public class DynamicStarMapActivity extends Activity implements OnSharedPreferen
         nightMode = !nightMode;
         sharedPreferences.edit().putString(ActivityLightLevelManager.LIGHT_MODE_KEY,
             nightMode ? "NIGHT" : "DAY").commit();
-        Analytics.getInstance(this).trackEvent(Analytics.USER_ACTION_CATEGORY,
-            Analytics.MENU_ITEM, Analytics.TOGGLED_NIGHT_MODE_LABEL, nightMode ? 1 : 0);
         break;
       case R.id.menu_item_time:
         Log.d(TAG, "Starting Time Dialog from menu");
-        Analytics.getInstance(this).trackEvent(Analytics.USER_ACTION_CATEGORY,
-            Analytics.MENU_ITEM, Analytics.TIME_TRAVEL_OPENED_LABEL, 1);
         if (!timePlayerUI.isShown()) {
           Log.d(TAG, "Resetting time in time travel dialog.");
           controller.goTimeTravel(new Date());
@@ -310,15 +293,12 @@ public class DynamicStarMapActivity extends Activity implements OnSharedPreferen
         break;
       case R.id.menu_item_gallery:
         Log.d(TAG, "Loading gallery");
-        Analytics.getInstance(this).trackEvent(Analytics.USER_ACTION_CATEGORY,
-            Analytics.MENU_ITEM, Analytics.GALLERY_OPENED_LABEL, 1);
         startActivity(new Intent(this, ImageGalleryActivity.class));
         break;
       case R.id.menu_item_tos:
         Log.d(TAG, "Loading ToS");
-        Analytics.getInstance(this).trackEvent(Analytics.USER_ACTION_CATEGORY,
-            Analytics.MENU_ITEM, Analytics.TOS_OPENED_LABEL, 1);
-        showDialog(DialogFactory.DIALOG_EULA_NO_BUTTONS);
+        startActivity(new Intent(this, ShowLicense.class));
+//        showDialog(DialogFactory.DIALOG_EULA_NO_BUTTONS);
         break;
       default:
         Log.e(TAG, "Unwired-up menu item");
@@ -330,7 +310,6 @@ public class DynamicStarMapActivity extends Activity implements OnSharedPreferen
   @Override
   public void onStart() {
     super.onStart();
-    Analytics.getInstance(this).trackPageView(Analytics.DYNAMIC_STARMAP_ACTIVITY);
     sessionStartTime = System.currentTimeMillis();
   }
 
@@ -363,9 +342,6 @@ public class DynamicStarMapActivity extends Activity implements OnSharedPreferen
     int sessionLengthSeconds = (int) ((
         System.currentTimeMillis() - sessionStartTime) / 1000);
     SessionBucketLength bucket = getSessionLengthBucket(sessionLengthSeconds);
-    Analytics.getInstance(this).trackEvent(
-        Analytics.GENERAL_CATEGORY, Analytics.SESSION_LENGTH_BUCKET,
-        bucket.toString(), sessionLengthSeconds);
   }
 
   @Override
@@ -500,9 +476,6 @@ public class DynamicStarMapActivity extends Activity implements OnSharedPreferen
     Log.d(TAG, "Query string " + queryString);
     List<SearchResult> results = layerManager.searchByObjectName(queryString);
     // Log the search, with value "1" for successful searches
-    Analytics.getInstance(this).trackEvent(
-        Analytics.USER_ACTION_CATEGORY, Analytics.SEARCH, "search:" + queryString,
-        results.size() > 0 ? 1 : 0);
     if (results.size() == 0) {
       Log.d(TAG, "No results returned");
       showDialog(DialogFactory.DIALOG_ID_NO_SEARCH_RESULTS);

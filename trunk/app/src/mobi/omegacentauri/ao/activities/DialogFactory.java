@@ -21,7 +21,6 @@ import mobi.omegacentauri.ao.R.layout;
 import mobi.omegacentauri.ao.R.string;
 import mobi.omegacentauri.ao.kml.KmlException;
 import mobi.omegacentauri.ao.search.SearchResult;
-import mobi.omegacentauri.ao.util.Analytics;
 import mobi.omegacentauri.ao.util.MiscUtil;
 import mobi.omegacentauri.ao.views.TimeTravelDialog;
 
@@ -57,8 +56,8 @@ public class DialogFactory {
   static final int DIALOG_ID_MULTIPLE_SEARCH_RESULTS = 2;
   static final int DIALOG_ID_NO_SEARCH_RESULTS = 3;
   static final int DIALOG_ID_HELP = 4;
-  static final int DIALOG_EULA_NO_BUTTONS = 5;
-  static final int DIALOG_EULA_WITH_BUTTONS = 6;
+//  static final int DIALOG_EULA_NO_BUTTONS = 5;
+//  static final int DIALOG_EULA_WITH_BUTTONS = 6;
   static final int DIALOG_ID_LOAD_KML = 7;
 
   private DynamicStarMapActivity parentActivity;
@@ -89,10 +88,10 @@ public class DialogFactory {
         return createMultipleSearchResultsDialog();
       case (DialogFactory.DIALOG_ID_TIME_TRAVEL):
         return createTimeTravelDialog();
-      case (DIALOG_EULA_NO_BUTTONS):
-        return createTermsOfServiceDialog(true);
-      case (DIALOG_EULA_WITH_BUTTONS):
-        return createTermsOfServiceDialog(false);
+//      case (DIALOG_EULA_NO_BUTTONS):
+//        return createTermsOfServiceDialog(true);
+//      case (DIALOG_EULA_WITH_BUTTONS):
+//        return createTermsOfServiceDialog(false);
       case (DIALOG_ID_LOAD_KML):
         return createLoadKmlDialog();
     }
@@ -223,8 +222,6 @@ public class DialogFactory {
                     editor.putBoolean(DynamicStarMapActivity.READ_TOS_PREF, true);
                     editor.commit();
                     dialog.dismiss();
-                    Analytics.getInstance(parentActivity).trackEvent(
-                        Analytics.APP_CATEGORY, Analytics.TOS_ACCEPT, Analytics.TOS_ACCEPTED, 1);
                   }
                 })
            .setNegativeButton(string.dialog_decline,
@@ -232,8 +229,6 @@ public class DialogFactory {
                  public void onClick(DialogInterface dialog, int whichButton) {
                    Log.d(TAG, "TOS Dialog closed.  User he say no.");
                    dialog.dismiss();
-                   Analytics.getInstance(parentActivity).trackEvent(
-                       Analytics.APP_CATEGORY, Analytics.TOS_ACCEPT, Analytics.TOS_REJECTED, 0);
                    parentActivity.finish();
                  }
                })

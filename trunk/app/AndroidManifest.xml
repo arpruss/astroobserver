@@ -3,8 +3,8 @@
     package="mobi.omegacentauri.ao"
     android:installLocation="auto"
     android:vmSafeMode="false"
-    android:versionName="1.0.0"
-    android:versionCode="1">
+    android:versionName="1.0.1"
+    android:versionCode="2">
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
     <uses-permission android:name="android.permission.WRITE_SETTINGS"/>
@@ -33,7 +33,7 @@
       android:launchMode="singleTask"
       android:screenOrientation="nosensor"
       android:configChanges="keyboardHidden|orientation">
-      <intent-filter>
+        <intent-filter>
         <action android:name="android.intent.action.SEARCH" />
         <category android:name="android.intent.category.DEFAULT"/>
       </intent-filter>
@@ -41,6 +41,7 @@
         android:resource="@xml/searchable" />
     </activity>
 
+    <activity android:name=".activities.ShowLicense"/>
     <activity android:name=".activities.EditSettingsActivity"/>
     <activity android:name=".activities.ImageGalleryActivity"
       android:theme="@android:style/Theme.NoTitleBar.Fullscreen"/>

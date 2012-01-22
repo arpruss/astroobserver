@@ -24,7 +24,6 @@ import android.view.animation.AnimationUtils;
 import android.view.animation.Animation.AnimationListener;
 
 import mobi.omegacentauri.ao.R;
-import mobi.omegacentauri.ao.util.Analytics;
 import mobi.omegacentauri.ao.util.MiscUtil;
 import mobi.omegacentauri.ao.util.OsVersions;
 
@@ -64,7 +63,6 @@ public class SplashScreenActivity extends Activity {
   @Override
   public void onStart() {
     super.onStart();
-    Analytics.getInstance(this).trackPageView(Analytics.SPLASH_SCREEN_ACTIVITY);
   }
 
   @Override
