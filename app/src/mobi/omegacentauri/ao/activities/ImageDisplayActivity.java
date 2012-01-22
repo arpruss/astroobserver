@@ -19,7 +19,6 @@ import mobi.omegacentauri.ao.activities.util.ActivityLightLevelChanger;
 import mobi.omegacentauri.ao.activities.util.ActivityLightLevelManager;
 import mobi.omegacentauri.ao.gallery.GalleryFactory;
 import mobi.omegacentauri.ao.gallery.GalleryImage;
-import mobi.omegacentauri.ao.util.Analytics;
 import mobi.omegacentauri.ao.util.MiscUtil;
 
 import android.app.Activity;
@@ -91,7 +90,6 @@ public class ImageDisplayActivity extends Activity {
   @Override
   public void onStart() {
     super.onStart();
-    Analytics.getInstance(this).trackPageView(Analytics.IMAGE_DISPLAY_ACTIVITY);
   }
 
   @Override

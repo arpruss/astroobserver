@@ -26,7 +26,6 @@ import android.view.View;
 import android.widget.ImageButton;
 
 import mobi.omegacentauri.ao.R;
-import mobi.omegacentauri.ao.util.Analytics;
 import mobi.omegacentauri.ao.util.MiscUtil;
 
 public class PreferencesButton extends ImageButton
@@ -96,8 +95,6 @@ public class PreferencesButton extends ImageButton
   @Override
   public void onClick(View v) {
     isOn = !isOn;
-    Analytics.getInstance(getContext()).trackEvent(
-        Analytics.USER_ACTION_CATEGORY, Analytics.PREFERENCE_BUTTON_TOGGLE, prefKey, isOn ? 1 : 0);
     setVisuallyOnOrOff();
     setPreference();
     if (secondaryOnClickListener != null) {

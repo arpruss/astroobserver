@@ -16,7 +16,6 @@ package mobi.omegacentauri.ao.activities;
 import mobi.omegacentauri.ao.R;
 import mobi.omegacentauri.ao.activities.util.ActivityLightLevelChanger;
 import mobi.omegacentauri.ao.activities.util.ActivityLightLevelManager;
-import mobi.omegacentauri.ao.util.Analytics;
 import mobi.omegacentauri.ao.util.MiscUtil;
 
 import android.app.AlertDialog;
@@ -75,7 +74,6 @@ public class EditSettingsActivity extends PreferenceActivity {
   @Override
   public void onStart() {
     super.onStart();
-    Analytics.getInstance(this).trackPageView(Analytics.EDIT_SETTINGS_ACTIVITY);
   }
 
   @Override
@@ -97,7 +95,6 @@ public class EditSettingsActivity extends PreferenceActivity {
    */
   private void updatePreferences() {
     Log.d(TAG, "Updating preferences");
-    Analytics.getInstance(this).setEnabled(findPreference(Analytics.PREF_KEY).isEnabled());
   }
 
   protected boolean setLatLongFromPlace(String place) {

@@ -1,7 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Please add  translation_description="" attributes to Strings to assist the translators. -->
 <resources>
-    <string name="app_name" translation_description="Application Title">AstroObserver</string>
+    <string name="app_name" translation_description="Application Title">Astro Observer</string>
+    <string name="license_title">License information</string>
+    <string name="show_license">View license information</string>
+    <string name="license">Copyright 2008-11 Google, Inc. and 2012 Omega Centauri<br/> Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at<br/>
+       http://www.apache.org/licenses/LICENSE-2.0.<br/>
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License."</string>
     <string name="menu_settings">Settings</string>
     <string name="menu_search">Search</string>
     <string name="cancel">Cancel</string>

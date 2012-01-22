@@ -27,11 +27,8 @@ import mobi.omegacentauri.ao.layers.NewMessierLayer;
 import mobi.omegacentauri.ao.layers.NewStarsLayer;
 import mobi.omegacentauri.ao.layers.PlanetsLayer;
 import mobi.omegacentauri.ao.layers.SkyGradientLayer;
-import mobi.omegacentauri.ao.util.Analytics;
-import mobi.omegacentauri.ao.util.Analytics.Slice;
 import mobi.omegacentauri.ao.util.MiscUtil;
 import mobi.omegacentauri.ao.util.OsVersions;
-import mobi.omegacentauri.ao.util.PreferenceChangeAnalyticsTracker;
 
 import android.app.Application;
 import android.content.Context;
@@ -66,12 +63,6 @@ public class StardroidApplication extends Application {
   private static LayerManager layerManager;
   private static ExecutorService backgroundExecutor;
 
-  // We need to maintain references to this object to keep it from
-  // getting gc'd.
-  private final PreferenceChangeAnalyticsTracker preferenceChangeAnalyticsTracker =
-      new PreferenceChangeAnalyticsTracker(Analytics.getInstance(this));
-
-
   @Override
   public void onCreate() {
     Log.d(TAG, "StardroidApplication: onCreate");
@@ -98,13 +89,6 @@ public class StardroidApplication extends Application {
   }
 
   private void setUpAnalytics(String versionName, SharedPreferences preferences) {
-    Analytics analytics = Analytics.getInstance(this);
-    analytics.setProductVersion(versionName);
-    analytics.setCustomVar(Slice.ANDROID_OS, Integer.toString(OsVersions.version()));
-    analytics.setCustomVar(Slice.SKYMAP_VERSION, versionName);
-    analytics.setCustomVar(Slice.DEVICE_NAME, android.os.Build.MODEL);
-    analytics.setEnabled(preferences.getBoolean(Analytics.PREF_KEY, true));
-    analytics.trackPageView(Analytics.APPLICATION_CREATE);
 
     String previousVersion = preferences.getString(PREVIOUS_APP_VERSION_PREF, NONE);
     if (previousVersion.equals(NONE)) {
@@ -119,22 +103,12 @@ public class StardroidApplication extends Application {
     if (!previousVersion.equals(versionName)) {
       // It's either an upgrade or a new installation
       Log.d(TAG, "New installation: version " + versionName);
-      analytics.trackEvent(Analytics.INSTALL_CATEGORY, Analytics.INSTALL_EVENT + versionName,
-          Analytics.PREVIOUS_VERSION + previousVersion, 1);
     }
-
-    // It will be interesting to see *when* people use Sky Map.
-    analytics.trackEvent(
-        Analytics.GENERAL_CATEGORY, Analytics.START_HOUR,
-        Integer.toString(Calendar.getInstance().get(Calendar.HOUR_OF_DAY)) + 'h', 0);
-
-    preferences.registerOnSharedPreferenceChangeListener(preferenceChangeAnalyticsTracker);
   }
 
   @Override
   public void onTerminate() {
     super.onTerminate();
-    Analytics.getInstance(this).setEnabled(false);
   }
 
   /**
