@@ -31,6 +31,8 @@ import android.util.Log;
  */
 public class ManualOrientationController extends AbstractController {
   private static final String TAG = MiscUtil.getTag(ManualOrientationController.class);
+  
+  private boolean altAz = true;
 
   @Override
   public void start() {
@@ -54,9 +56,19 @@ public class ManualOrientationController extends AbstractController {
     if (!enabled) {
       return;
     }
+    
     Pointing pointing = model.getPointing();
     GeocentricCoordinates pointingXyz = pointing.getLineOfSight();
     GeocentricCoordinates topXyz = pointing.getPerpendicular();
+
+    if (altAz) {
+    	float degrees = radians * 180f / (float)Math.PI;
+        Matrix33 rotation = Geometry.calculateRotationMatrix(degrees, model.getZenith());
+        model.setPointing(Geometry.matrixVectorMultiply(rotation, pointingXyz),
+        		Geometry.matrixVectorMultiply(rotation, topXyz));
+        return;
+    }
+    
     Vector3 horizontalXyz = Geometry.vectorProduct(pointingXyz, topXyz);
     Vector3 deltaXyz = Geometry.scaleVector(horizontalXyz, radians);
 
@@ -82,6 +94,35 @@ public class ManualOrientationController extends AbstractController {
     // Log.d(TAG, "Current view direction " + viewDir);
     GeocentricCoordinates topXyz = pointing.getPerpendicular();
 
+    if (altAz) {
+    	float currentAngle = (float)Math.acos((double)Geometry.cosineSimilarity(pointingXyz, model.getZenith())); 
+    	
+    	Log.d(TAG, "currentAngle "+currentAngle+" rotation="+radians);
+    	
+    	Vector3 zenith = model.getZenith();
+    	
+    	if (radians < 0 &&  currentAngle <= -radians) {
+    		model.setPointing(zenith, topXyz);    		
+    	}
+    	else if (radians > 0 && currentAngle >= (float)Math.PI-radians) {
+    		model.setPointing(Geometry.scaleVector(zenith, -1f), topXyz);    		    		
+    	}
+    	else {
+        	float degrees = radians * 180f / (float)Math.PI;
+
+        	Vector3 rotationVector = Geometry.vectorProduct(pointingXyz,
+        			topXyz);
+        	
+	        Matrix33 rotation = Geometry.calculateRotationMatrix(degrees, 
+	        		rotationVector);
+	        
+	        model.setPointing(Geometry.matrixVectorMultiply(rotation, pointingXyz),
+	        		Geometry.matrixVectorMultiply(rotation, topXyz));
+    	}
+        
+        return;
+    }
+    
     Vector3 deltaXyz = Geometry.scaleVector(topXyz, -radians);
     Vector3 newPointingXyz = Geometry.addVectors(pointingXyz, deltaXyz);
     newPointingXyz.normalize();
@@ -91,6 +132,8 @@ public class ManualOrientationController extends AbstractController {
     newUpXyz.normalize();
 
     model.setPointing(newPointingXyz, newUpXyz);
+
+    resetRotation();
   }
 
   /**
@@ -112,5 +155,39 @@ public class ManualOrientationController extends AbstractController {
     newUpXyz.normalize();
 
     model.setPointing(pointingXyz, newUpXyz);
+  }
+
+
+  /**
+   * Reset rotation.
+   */
+  public void resetRotation() {
+    Log.d(TAG, "Unrotating");
+    
+    if (altAz) {
+	    Pointing pointing = model.getPointing();
+	
+	    GeocentricCoordinates pointingXyz = pointing.getLineOfSight();
+	    /* TODO: fix if too close to zenith */
+	    Vector3 right = Geometry.vectorProduct(pointingXyz, model.getZenith());
+	    
+	    if (Geometry.scalarProduct(right, right)<1e-15) {
+	    	/* too close */
+	    	return;
+	    }
+	    
+	    right.normalize();
+	    Vector3 up = Geometry.vectorProduct(right, pointingXyz);
+	    
+	    model.setPointing(pointingXyz, up); 
+    }
+  }
+  
+  public void setAltAz(boolean altAz) {
+	  this.altAz = altAz;
+	  
+	  if (altAz && enabled) {
+		  resetRotation();
+	  }
   }
 }
