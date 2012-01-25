@@ -35,6 +35,10 @@
       android:key="source_provider.5"
       android:defaultValue="true"
       android:title="@string/show_horizon_pref" />
+    <CheckBoxPreference
+      android:key="zoom_with_volume"
+      android:defaultValue="false"
+      android:title="@string/zoom_with_volume" />
     <!--  TODO(johntaylor): restore this once it's toggling properly CheckBoxPreference
       android:key="show_planetary_images"
       android:defaultValue="true"

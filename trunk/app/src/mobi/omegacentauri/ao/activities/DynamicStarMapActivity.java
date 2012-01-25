@@ -128,6 +128,7 @@ public class DynamicStarMapActivity extends Activity implements OnSharedPreferen
   private static final String BUNDLE_Z_TARGET = "bundle_z_target";
   private static final String BUNDLE_SEARCH_MODE = "bundle_search";
   private static final String SOUND_EFFECTS = "sound_effects";
+  private static final String ZOOM_WITH_VOLUME = "zoom_with_volume";
   private static final int DELAY_BETWEEN_ZOOM_REPEATS_MILLIS = 100;
   private static final float ROTATION_SPEED = 10;
   private static final String TAG = MiscUtil.getTag(DynamicStarMapActivity.class);
@@ -167,6 +168,8 @@ public class DynamicStarMapActivity extends Activity implements OnSharedPreferen
   private ActivityLightLevelManager activityLightLevelManager;
   private long sessionStartTime;
   private boolean haveOrientationSensors;
+  private boolean volumeUpIsDown = false;
+  private boolean volumeDownIsDown = false;
 
   @Override
   public void onCreate(Bundle icicle) {
@@ -245,10 +248,45 @@ public class DynamicStarMapActivity extends Activity implements OnSharedPreferen
     Log.d(TAG, "DynamicStarMap onDestroy");
     super.onDestroy();
   }
+  
+  @Override
+  public boolean onKeyUp(int keyCode, KeyEvent event) {
+	  switch (keyCode) {
+	  case (KeyEvent.KEYCODE_VOLUME_UP):
+		  volumeUpIsDown = false;
+	  break;
+	  case (KeyEvent.KEYCODE_VOLUME_DOWN):
+		  volumeDownIsDown = false;
+	  break;
+	  }
+	  return super.onKeyDown(keyCode, event);	    
+  }
 
   @Override
   public boolean onKeyDown(int keyCode, KeyEvent event) {
-    switch (keyCode) {
+	  switch (keyCode) {
+	  case (KeyEvent.KEYCODE_VOLUME_UP):
+		  if (sharedPreferences.getBoolean(ZOOM_WITH_VOLUME, false)) {
+//			  if (! volumeUpIsDown) { 
+				  volumeUpIsDown = true;
+				  controller.zoomIn();
+//			  }
+		  }
+		  else {
+			  return super.onKeyDown(keyCode, event);
+		  }
+	  	break;
+	  case (KeyEvent.KEYCODE_VOLUME_DOWN):
+		  if (sharedPreferences.getBoolean(ZOOM_WITH_VOLUME, false)) {
+//			  if (! volumeDownIsDown) { 
+				  volumeDownIsDown = true;
+				  controller.zoomOut();
+//			  }
+		  }
+		  else {
+			  return super.onKeyDown(keyCode, event);
+		  }
+	  	break;      	
       case (KeyEvent.KEYCODE_DPAD_LEFT):
         Log.d(TAG, "Key left");
         controller.rotate(-10.0f);
