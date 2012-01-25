@@ -37,7 +37,7 @@ public class MapMover implements
     OnSharedPreferenceChangeListener {
 
   private static final String TAG = MiscUtil.getTag(MapMover.class);
-  private static final String ALLOW_ROTATION = "allow_rotation";
+  public static final String ALLOW_ROTATION = "allow_rotation";
   private AstronomerModel model;
   private ControllerGroup controllerGroup;
   private float sizeTimesRadiansToDegrees;
@@ -56,7 +56,7 @@ public class MapMover implements
     Log.i(TAG, "Screen height is " + screenLongSize + " pixels.");
     sizeTimesRadiansToDegrees = screenLongSize * Geometry.RADIANS_TO_DEGREES;
     sharedPreferences.registerOnSharedPreferenceChangeListener(this);
-    allowRotation = sharedPreferences.getBoolean(ALLOW_ROTATION, true);
+    allowRotation = sharedPreferences.getBoolean(ALLOW_ROTATION, true)s;
   }
 
   @Override
@@ -76,6 +76,10 @@ public class MapMover implements
     } else {
       return false;
     }
+  }
+  
+  public boolean isRotationAllowed() {
+	  return allowRotation;
   }
 
   @Override

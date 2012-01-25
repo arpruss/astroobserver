@@ -170,6 +170,7 @@ public class DynamicStarMapActivity extends Activity implements OnSharedPreferen
   private boolean haveOrientationSensors;
   private boolean volumeUpIsDown = false;
   private boolean volumeDownIsDown = false;
+private MapMover mapMover;
 
   @Override
   public void onCreate(Bundle icicle) {
@@ -259,7 +260,7 @@ public class DynamicStarMapActivity extends Activity implements OnSharedPreferen
 		  volumeDownIsDown = false;
 	  break;
 	  }
-	  return super.onKeyDown(keyCode, event);	    
+	  return super.onKeyUp(keyCode, event);	    
   }
 
   @Override
@@ -567,10 +568,14 @@ public class DynamicStarMapActivity extends Activity implements OnSharedPreferen
 
   private void setAutoMode(boolean auto) {
     Log.d(TAG, "setAutoMode "+auto);
-    controller.setAutoMode(auto);
+    controller.setAutoMode(auto, supportRotation());
   }
 
-  private void wireUpScreenControls() {
+  private boolean supportRotation() {
+	  return mapMover.isRotationAllowed();
+  }
+
+private void wireUpScreenControls() {
     cancelSearchButton = (ImageButton) findViewById(R.id.cancel_search_button);
     // TODO(johntaylor): move to set this in the XML once we don't support 1.5
     cancelSearchButton.setOnClickListener(new OnClickListener() {
@@ -644,7 +649,7 @@ public class DynamicStarMapActivity extends Activity implements OnSharedPreferen
 	    faders = new WidgetFader[] {layerControlFader, zoomControlFader};    	
     }
 
-    MapMover mapMover = new MapMover(model, controller, this, sharedPreferences);
+    mapMover = new MapMover(model, controller, this, sharedPreferences);
     gestureDetector = new GestureDetector(new GestureInterpreter(
         faders,
         mapMover));

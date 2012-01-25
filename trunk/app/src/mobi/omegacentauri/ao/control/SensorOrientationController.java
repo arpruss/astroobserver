@@ -25,6 +25,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorListener;
 import android.hardware.SensorManager;
 import android.preference.PreferenceManager;
+import android.text.method.Touch;
 import android.util.Log;
 
 /**
@@ -79,7 +80,7 @@ public class SensorOrientationController extends AbstractController
   public static boolean haveOrientationSensors(Context context) {
 	  SensorManager m = (SensorManager)context.getSystemService(Context.SENSOR_SERVICE); 
 	  return m.getSensorList(Sensor.TYPE_MAGNETIC_FIELD).size() > 0 &&
-	  		m.getSensorList(Sensor.TYPE_ACCELEROMETER).size() > 0;
+	  		m.getSensorList(Sensor.TYPE_ACCELEROMETER).size() > 0;	  		
   }
 
   public SensorOrientationController(Context context) {

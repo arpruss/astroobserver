@@ -58,7 +58,7 @@ public class ControllerGroup implements Controller {
     group.addController(group.zoomController);
     group.teleportingController = new TeleportingController();
     group.addController(group.teleportingController);
-    group.setAutoMode(true);
+    group.setAutoMode(true, true);
     return group;
   }
 
@@ -144,12 +144,22 @@ public class ControllerGroup implements Controller {
 
   /**
    * Sets auto mode (true) or manual mode (false).
+ * @param supportRotation 
    */
-  public void setAutoMode(boolean enabled) {
+  public void setAutoMode(boolean enabled, boolean allowRotation) {
     manualDirectionController.setEnabled(!enabled);
     sensorOrientationController.setEnabled(enabled);
     if (model != null) {
       model.setAutoUpdatePointing(enabled);
+    }
+    if (!enabled) {
+    	if (!allowRotation) {
+    		manualDirectionController.resetRotation();
+    		manualDirectionController.setAltAz(true);
+    	}
+    	else {
+    		manualDirectionController.setAltAz(false);    		
+    	}
     }
     usingAutoMode = enabled;
   }
