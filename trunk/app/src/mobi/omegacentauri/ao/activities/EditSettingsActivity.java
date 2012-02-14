@@ -102,6 +102,7 @@ public class EditSettingsActivity extends PreferenceActivity {
     try {
       addresses = geocoder.getFromLocationName(place, 1);
     } catch (IOException e) {
+      Log.e(TAG, ""+e);
       Toast.makeText(this, getString(R.string.location_unable_to_geocode), Toast.LENGTH_SHORT).show();
       return false;
     }

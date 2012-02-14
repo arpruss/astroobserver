@@ -36,11 +36,15 @@ import android.widget.Toast;
 
 import mobi.omegacentauri.ao.R;
 import mobi.omegacentauri.ao.units.LatLong;
+import mobi.omegacentauri.ao.util.IO;
 import mobi.omegacentauri.ao.util.MiscUtil;
+import mobi.omegacentauri.ao.util.OsVersions;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Sets the AstronomerModel's (and thus the user's) position using one of the
@@ -105,16 +109,24 @@ public class LocationController extends AbstractController implements LocationLi
     String locationProvider = locationManager.getBestProvider(locationCriteria, true);
     if (locationProvider == null) {
       Log.w(TAG, "No location provider is enabled");
-      String possiblelocationProvider = locationManager.getBestProvider(locationCriteria, false);
-      if (possiblelocationProvider == null) {
-        // TODO(johntaylor): should we make this a dialog?
+      
+  	if (!setLocationFromIP()) {
         Toast.makeText(context, R.string.location_no_auto, Toast.LENGTH_LONG).show();
         setLocationFromPrefs();
+	}
+
+  	String possiblelocationProvider = locationManager.getBestProvider(locationCriteria, false);
+      if (possiblelocationProvider != null) {
         return;
       }
 
-      AlertDialog.Builder alertDialog = getSwitchOnGPSDialog();
-      alertDialog.show();
+      if (!OsVersions.isKindle()) {
+    	  /* Won't bother with this dialog.  But Kindle users should bug Amazon 
+    	   * about the impossibility of activating a location provider.
+    	   */
+	      AlertDialog.Builder alertDialog = getSwitchOnGPSDialog();
+	      alertDialog.show();
+      }
       return;
     } else {
       Log.d(TAG, "Got location provider " + locationProvider);
@@ -133,7 +145,39 @@ public class LocationController extends AbstractController implements LocationLi
     Log.d(TAG, "LocationController -start");
   }
 
-  private void setLocationInModel(LatLong location, String provider) {
+  private boolean setLocationFromIP() {	  
+	  String url = "http://api.hostip.info/get_html.php?position=true";
+	  String data = IO.getURLFile(url);
+
+	  try {
+		  Log.v(TAG, ""+data);
+		  
+		  Pattern p = Pattern.compile("Latitude:\\s+([-.0-9]+)");
+		  Matcher m = p.matcher(data);
+		  if (!m.find())
+			  return false;
+		  float latitude = Float.parseFloat(m.group(1));
+		  p = Pattern.compile("Longitude:\\s+([-.0-9]+)");
+		  m = p.matcher(data);
+		  if (!m.find())
+			  return false;
+		  float longitude = Float.parseFloat(m.group(1));
+		  
+		  Log.v(TAG, "From "+url+" got "+latitude+" "+longitude);
+		  
+		  LatLong myPosition = new LatLong(latitude, longitude);
+
+		  setLocationInModel(myPosition, url);
+		  showLocationToUser(myPosition, url);
+		  
+		  return true;
+	  }
+	  catch (NumberFormatException e) {
+		  return false;
+	  }
+  }
+
+private void setLocationInModel(LatLong location, String provider) {
     LatLong oldLocation = model.getLocation();
     if (location.distanceFrom(oldLocation) > MIN_DIST_TO_SHOW_TOAST_DEGS) {
       Log.d(TAG, "Informing user of change of location");

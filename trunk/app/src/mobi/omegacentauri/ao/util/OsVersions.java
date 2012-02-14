@@ -15,6 +15,7 @@
 package mobi.omegacentauri.ao.util;
 
 import android.app.Activity;
+import android.os.Build;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -47,6 +48,13 @@ public class OsVersions {
     // once we no longer support 1.5.
     String versionString = android.os.Build.VERSION.SDK;
     return Integer.parseInt(versionString);
+  }
+  
+  /**
+   * Is this a Kindle Fire?
+   */
+  public static boolean isKindle() {
+	  return Build.MODEL.equalsIgnoreCase("Kindle Fire");
   }
 
   /**
