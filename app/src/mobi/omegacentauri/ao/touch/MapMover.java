@@ -56,7 +56,7 @@ public class MapMover implements
     Log.i(TAG, "Screen height is " + screenLongSize + " pixels.");
     sizeTimesRadiansToDegrees = screenLongSize * Geometry.RADIANS_TO_DEGREES;
     sharedPreferences.registerOnSharedPreferenceChangeListener(this);
-    allowRotation = sharedPreferences.getBoolean(ALLOW_ROTATION, true)s;
+    allowRotation = sharedPreferences.getBoolean(ALLOW_ROTATION, true);
   }
 
   @Override

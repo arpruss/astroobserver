@@ -3,8 +3,8 @@
     package="mobi.omegacentauri.ao"
     android:installLocation="auto"
     android:vmSafeMode="false"
-    android:versionName="1.0.4"
-    android:versionCode="3">
+    android:versionName="1.0.5"
+    android:versionCode="4">
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
     <uses-permission android:name="android.permission.WRITE_SETTINGS"/>
