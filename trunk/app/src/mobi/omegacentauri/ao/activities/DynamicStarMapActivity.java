@@ -182,7 +182,7 @@ private MapMover mapMover;
     dialogFactory = new DialogFactory(this);
     sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
     sharedPreferences.registerOnSharedPreferenceChangeListener(this);
-
+    
 //    boolean eulaConfirmed = sharedPreferences.getBoolean(READ_TOS_PREF, false);
 //    if (!eulaConfirmed) {
 //      showDialog(DialogFactory.DIALOG_EULA_WITH_BUTTONS);
@@ -233,6 +233,8 @@ private MapMover mapMover;
       Log.d(TAG, "Started as a result of a search");
       doSearchWithIntent(intent);
     }
+
+	new PleaseBuy(this, false);
     Log.d(TAG, "-onCreate at " + System.currentTimeMillis());
   }
 
@@ -315,46 +317,50 @@ private MapMover mapMover;
   public boolean onOptionsItemSelected(MenuItem item) {
     super.onOptionsItemSelected(item);
     switch (item.getItemId()) {
-      case R.id.menu_item_search:
-        Log.d(TAG, "Search");
-        onSearchRequested();
-        break;
-      case R.id.menu_item_settings:
-        Log.d(TAG, "Settings");
-        startActivity(new Intent(this, EditSettingsActivity.class));
-        break;
-      case R.id.menu_item_help:
-        Log.d(TAG, "Help");
-        showDialog(DialogFactory.DIALOG_ID_HELP);
-        break;
-      case R.id.menu_item_dim:
-        Log.d(TAG, "Toggling nightmode");
-        nightMode = !nightMode;
-        sharedPreferences.edit().putString(ActivityLightLevelManager.LIGHT_MODE_KEY,
-            nightMode ? "NIGHT" : "DAY").commit();
-        break;
-      case R.id.menu_item_time:
-        Log.d(TAG, "Starting Time Dialog from menu");
-        if (!timePlayerUI.isShown()) {
-          Log.d(TAG, "Resetting time in time travel dialog.");
-          controller.goTimeTravel(new Date());
-        } else {
-          Log.d(TAG, "Resuming current time travel dialog.");
-        }
-        showDialog(DialogFactory.DIALOG_ID_TIME_TRAVEL);
-        break;
-      case R.id.menu_item_gallery:
-        Log.d(TAG, "Loading gallery");
-        startActivity(new Intent(this, ImageGalleryActivity.class));
-        break;
-      case R.id.menu_item_tos:
-        Log.d(TAG, "Loading ToS");
-        startActivity(new Intent(this, ShowLicense.class));
-//        showDialog(DialogFactory.DIALOG_EULA_NO_BUTTONS);
-        break;
-      default:
-        Log.e(TAG, "Unwired-up menu item");
-        return false;
+    case R.id.menu_please_buy:
+    	Log.d(TAG, "Please bug");
+    	new PleaseBuy(this, true);
+    	break;
+    case R.id.menu_item_search:
+    	Log.d(TAG, "Search");
+    	onSearchRequested();
+    	break;
+    case R.id.menu_item_settings:
+    	Log.d(TAG, "Settings");
+    	startActivity(new Intent(this, EditSettingsActivity.class));
+    	break;
+    case R.id.menu_item_help:
+    	Log.d(TAG, "Help");
+    	showDialog(DialogFactory.DIALOG_ID_HELP);
+    	break;
+    case R.id.menu_item_dim:
+    	Log.d(TAG, "Toggling nightmode");
+    	nightMode = !nightMode;
+    	sharedPreferences.edit().putString(ActivityLightLevelManager.LIGHT_MODE_KEY,
+    			nightMode ? "NIGHT" : "DAY").commit();
+    	break;
+    case R.id.menu_item_time:
+    	Log.d(TAG, "Starting Time Dialog from menu");
+    	if (!timePlayerUI.isShown()) {
+    		Log.d(TAG, "Resetting time in time travel dialog.");
+    		controller.goTimeTravel(new Date());
+    	} else {
+    		Log.d(TAG, "Resuming current time travel dialog.");
+    	}
+    	showDialog(DialogFactory.DIALOG_ID_TIME_TRAVEL);
+    	break;
+    case R.id.menu_item_gallery:
+    	Log.d(TAG, "Loading gallery");
+    	startActivity(new Intent(this, ImageGalleryActivity.class));
+    	break;
+    case R.id.menu_item_tos:
+    	Log.d(TAG, "Loading ToS");
+    	startActivity(new Intent(this, ShowLicense.class));
+    	//        showDialog(DialogFactory.DIALOG_EULA_NO_BUTTONS);
+    	break;
+    default:
+    	Log.e(TAG, "Unwired-up menu item");
+    	return false;
     }
     return true;
   }

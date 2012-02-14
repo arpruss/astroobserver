@@ -46,6 +46,10 @@
           android:title="@string/menu_help"
           android:icon="@android:drawable/ic_menu_info_details"/>
 
+    <item android:id="@+id/menu_please_buy"
+          android:orderInCategory="6"
+          android:title="@string/menu_please_buy"/>
+
     <!-- TODO(serafini): We need an icon for this? -->
     <item android:id="@+id/menu_item_tos"
           android:orderInCategory="7"
