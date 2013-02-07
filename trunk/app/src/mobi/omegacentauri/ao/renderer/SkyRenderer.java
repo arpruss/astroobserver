@@ -105,8 +105,9 @@ public class SkyRenderer implements GLSurfaceView.Renderer {
 
   // Returns true if the buffers should be swapped, false otherwise.
   public void onDrawFrame(GL10 gl) {
+		
     // Initialize any of the unloaded managers.
-    for (ManagerReloadData data : mManagersToReload) {
+	for (ManagerReloadData data : mManagersToReload) {
       data.manager.reload(gl, data.fullReload);
     }
     mManagersToReload.clear();

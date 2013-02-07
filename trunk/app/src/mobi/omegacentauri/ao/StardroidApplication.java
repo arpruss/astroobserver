@@ -55,6 +55,7 @@ public class StardroidApplication extends Application {
   private static final String PREVIOUS_APP_VERSION_PREF = "previous_app_version";
   private static final String NONE = "Clean install";
   private static final String UNKNOWN = "Unknown previous version";
+  private static final boolean DEBUG = true;
   // The Application class is a singleton, so treat it as such, with static
   // fields.  This is necessary so that the content provider can access the
   // things it needs; there seems to be no easy way for a ContentProvider
@@ -62,6 +63,11 @@ public class StardroidApplication extends Application {
   private static AstronomerModel model;
   private static LayerManager layerManager;
   private static ExecutorService backgroundExecutor;
+  
+  public void log(String s) {
+	  if (DEBUG)
+		  Log.i("OpenStarMap", s);
+  }
 
   @Override
   public void onCreate() {

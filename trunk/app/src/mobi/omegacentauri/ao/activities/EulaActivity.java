@@ -36,6 +36,7 @@ public class EulaActivity extends Activity {
     Log.d(TAG, "SplashScreen onCreate");
     super.onCreate(savedInstanceState);
     setContentView(R.layout.splash);
+    finish();
     
     final View graphic = findViewById(R.id.splash);
     Animation fadeAnimation = AnimationUtils.loadAnimation(this, R.anim.fadeout);

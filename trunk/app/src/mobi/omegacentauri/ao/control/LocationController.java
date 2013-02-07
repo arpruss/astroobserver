@@ -120,13 +120,13 @@ public class LocationController extends AbstractController implements LocationLi
         return;
       }
 
-      if (!OsVersions.isKindle()) {
-    	  /* Won't bother with this dialog.  But Kindle users should bug Amazon 
-    	   * about the impossibility of activating a location provider.
-    	   */
+//      if (!OsVersions.isKindle()) {
+//    	  /* Won't bother with this dialog.  But Kindle Fire 1 users should bug Amazon 
+//    	   * about the impossibility of activating a location provider.
+//    	   */
 	      AlertDialog.Builder alertDialog = getSwitchOnGPSDialog();
 	      alertDialog.show();
-      }
+//      }
       return;
     } else {
       Log.d(TAG, "Got location provider " + locationProvider);
