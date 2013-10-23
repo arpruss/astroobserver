@@ -30,8 +30,8 @@ import android.util.Log;
  */
 public class PlainSmootherModelAdaptor implements SensorListener {
   private static final String TAG = MiscUtil.getTag(PlainSmootherModelAdaptor.class);
-  private Vector3 magneticValues = ApplicationConstants.INITIAL_SOUTH;
-  private Vector3 acceleration = ApplicationConstants.INITIAL_DOWN;
+  private Vector3 magneticValues = ApplicationConstants.INITIAL_SOUTH.copy();
+  private Vector3 acceleration = ApplicationConstants.INITIAL_DOWN.copy();
   private AstronomerModel model;
 
   public PlainSmootherModelAdaptor(AstronomerModel model) {
@@ -54,6 +54,8 @@ public class PlainSmootherModelAdaptor implements SensorListener {
     } else {
       Log.e(TAG, "Pump is receiving values that aren't accel or magnetic");
     }
+    if (magneticValues.length() < 0.001f)
+    	magneticValues.assign(ApplicationConstants.INITIAL_SOUTH);
     model.setPhoneSensorValues(acceleration, magneticValues);
   }
 
