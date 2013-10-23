@@ -207,7 +207,7 @@ private MapMover mapMover;
     }
     else {
         Log.d(TAG, "onCreate: have orientation sensors");
-    	setAutoMode(sharedPreferences.getBoolean(AUTO_MODE_PREF_KEY, true));
+    	setAutoMode(sharedPreferences.getBoolean(AUTO_MODE_PREF_KEY, false));
     }	
 
     // Search related
@@ -721,7 +721,7 @@ private void wireUpScreenControls() {
     searchTargetName = searchTerm;
     Log.d(TAG, "Searching for target=" + target);
     rendererController.queueEnableSearchOverlay(target.copy(), searchTerm);
-    boolean autoMode = sharedPreferences.getBoolean(AUTO_MODE_PREF_KEY, true);
+    boolean autoMode = sharedPreferences.getBoolean(AUTO_MODE_PREF_KEY, false);
     if (!autoMode) {
       controller.teleport(target);
     }
