@@ -29,7 +29,7 @@ public class WidgetFader implements Runnable {
   private Fadeable controls;
   private boolean visible;
   private Handler handler;
-  private int timeOut = 1500;
+  private int timeOut = 3000;
   
   public WidgetFader(Fadeable controls) {
     this.controls = controls;

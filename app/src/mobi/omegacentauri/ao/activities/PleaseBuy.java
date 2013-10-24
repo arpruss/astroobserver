@@ -33,11 +33,7 @@ public class PleaseBuy {
 
         alertDialog.setTitle("Other applications?");
         
-        alertDialog.setMessage("Do you wish to visit the "+market+" "+
-        		"to find other apps from Omega Centauri Software, like the ScreenDim app "+
-        		"that lets you reduce screen brightness below standard settings, and the LunarMap HD/Lite moon maps? "+
-        		"You can return to Open Star Map with the BACK button.  (You can "+
-        		"always get this option by pulling up the menu and choosing 'More'.)");
+        alertDialog.setMessage("If you liked this, you may like our LunarMap moon maps and ScreenDim dimmer!  Visit " +market + "?");
         
         alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, 
         		"See other apps", 
