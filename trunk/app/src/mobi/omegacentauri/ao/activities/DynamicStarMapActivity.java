@@ -339,6 +339,17 @@ private MapMover mapMover;
     	sharedPreferences.edit().putString(ActivityLightLevelManager.LIGHT_MODE_KEY,
     			nightMode ? "NIGHT" : "DAY").commit();
     	break;
+    case R.id.menu_item_share:
+    	Log.d(TAG, "Sharing");
+    	Intent i = new Intent(Intent.ACTION_VIEW);
+    	i.setType("text/astro_position");
+    	GeocentricCoordinates c = model.getPointing().getLineOfSight();
+  
+    	i.putExtra("RA", (double)c.getRARadians());
+    	i.putExtra("Declination", (double)c.getDecRadians());
+    	i.putExtra("Size", (double)Math.toRadians((double)model.getFieldOfView()));
+    	startActivity(Intent.createChooser(i, getString(R.string.share_chooser)));
+    	break;
     case R.id.menu_item_time:
     	Log.d(TAG, "Starting Time Dialog from menu");
     	if (!timePlayerUI.isShown()) {

@@ -46,7 +46,7 @@
   </PreferenceCategory>
   <PreferenceCategory android:title="@string/other">
     <PreferenceScreen android:title="@string/location_prefs">
-      <PreferenceCategory>
+      <PreferenceCategory android:key="location_settings">
         <CheckBoxPreference
           android:defaultValue="false"
           android:title="@string/force_gps_pref"
