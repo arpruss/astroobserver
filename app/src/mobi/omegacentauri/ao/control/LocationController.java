@@ -53,283 +53,289 @@ import java.util.regex.Pattern;
  * @author John Taylor
  */
 public class LocationController extends AbstractController implements LocationListener {
-  // Must match the key in the preferences file.
-  private static final String NO_AUTO_LOCATE = "no_auto_locate";
-  // Must match the key in the preferences file.
-  private static final String FORCE_GPS = "force_gps";
-  private static final int MINIMUM_DISTANCE_BEFORE_UPDATE_METRES = 2000;
-  private static final int LOCATION_UPDATE_TIME_MILLISECONDS = 600000;
-  private static final String TAG = MiscUtil.getTag(LocationController.class);
-  private static final float MIN_DIST_TO_SHOW_TOAST_DEGS = 0.01f;
+	// Must match the key in the preferences file.
+	private static final String NO_AUTO_LOCATE = "no_auto_locate";
+	// Must match the key in the preferences file.
+	private static final String FORCE_GPS = "force_gps";
+	private static final int MINIMUM_DISTANCE_BEFORE_UPDATE_METRES = 2000;
+	private static final int LOCATION_UPDATE_TIME_MILLISECONDS = 600000;
+	private static final String TAG = MiscUtil.getTag(LocationController.class);
+	private static final float MIN_DIST_TO_SHOW_TOAST_DEGS = 0.01f;
 
-  private Context context;
-  private LocationManager locationManager;
+	private Context context;
+	private LocationManager locationManager;
 
-  public LocationController(Context context) {
-    this.context = context;
-    locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
-    if (locationManager != null) {
-      Log.d(TAG, "Got location Manager");
-    } else {
-      Log.d(TAG, "Didn't get location manager");
-    }
-  }
-
-  @Override
-  public void start() {
-    Log.d(TAG, "LocationController start");
-    boolean noAutoLocate = PreferenceManager.getDefaultSharedPreferences(context).getBoolean(
-        NO_AUTO_LOCATE, false);
-
-    boolean forceGps = PreferenceManager.getDefaultSharedPreferences(context).getBoolean(FORCE_GPS,
-        false);
-
-    if (noAutoLocate) {
-      Log.d(TAG, "User has elected to set location manually.");
-      setLocationFromPrefs();
-      Log.d(TAG, "LocationController -start");
-      return;
-    }
-
-    if (locationManager == null) {
-      // TODO(johntaylor): find out under what circumstances this can happen.
-      Log.e(TAG, "Location manager was null - using preferences");
-      setLocationFromPrefs();
-      return;
-    }
-
-    Criteria locationCriteria = new Criteria();
-    locationCriteria.setAccuracy(forceGps ? Criteria.ACCURACY_FINE : Criteria.ACCURACY_COARSE);
-    locationCriteria.setAltitudeRequired(false);
-    locationCriteria.setBearingRequired(false);
-    locationCriteria.setCostAllowed(true);
-    locationCriteria.setSpeedRequired(false);
-    locationCriteria.setPowerRequirement(Criteria.POWER_LOW);
-
-    String locationProvider = locationManager.getBestProvider(locationCriteria, true);
-    if (locationProvider == null) {
-      Log.w(TAG, "No location provider is enabled");
-      
-  	if (!setLocationFromIP()) {
-        Toast.makeText(context, R.string.location_no_auto, Toast.LENGTH_LONG).show();
-        setLocationFromPrefs();
+	public LocationController(Context context) {
+		this.context = context;
+		locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+		if (locationManager != null) {
+			Log.d(TAG, "Got location Manager");
+		} else {
+			Log.d(TAG, "Didn't get location manager");
+		}
 	}
 
-  	String possiblelocationProvider = locationManager.getBestProvider(locationCriteria, false);
-      if (possiblelocationProvider != null) {
-        return;
-      }
+	@Override
+	public void start() {
+		Log.d(TAG, "LocationController start");
+		boolean noAutoLocate = PreferenceManager.getDefaultSharedPreferences(context).getBoolean(
+				NO_AUTO_LOCATE, false);
 
-//      if (!OsVersions.isKindle()) {
-//    	  /* Won't bother with this dialog.  But Kindle Fire 1 users should bug Amazon 
-//    	   * about the impossibility of activating a location provider.
-//    	   */
-	      AlertDialog.Builder alertDialog = getSwitchOnGPSDialog();
-	      alertDialog.show();
-//      }
-      return;
-    } else {
-      Log.d(TAG, "Got location provider " + locationProvider);
-    }
+		boolean forceGps = PreferenceManager.getDefaultSharedPreferences(context).getBoolean(FORCE_GPS,
+				false);
 
-    locationManager.requestLocationUpdates(locationProvider, LOCATION_UPDATE_TIME_MILLISECONDS,
-                                                             MINIMUM_DISTANCE_BEFORE_UPDATE_METRES,
-                                                             this);
+		if (noAutoLocate) {
+			Log.d(TAG, "User has elected to set location manually.");
+			setLocationFromPrefs();
+			Log.d(TAG, "LocationController -start");
+			return;
+		}
 
-    Location location = locationManager.getLastKnownLocation(locationProvider);
-    if (location != null) {
-      LatLong myLocation = new LatLong(location.getLatitude(), location.getLongitude());
-      setLocationInModel(myLocation, location.getProvider());
-    }
+		if (locationManager == null) {
+			// TODO(johntaylor): find out under what circumstances this can happen.
+			Log.e(TAG, "Location manager was null - using preferences");
+			setLocationFromPrefs();
+			return;
+		}
 
-    Log.d(TAG, "LocationController -start");
-  }
+		Criteria locationCriteria = new Criteria();
+		locationCriteria.setAccuracy(forceGps ? Criteria.ACCURACY_FINE : Criteria.ACCURACY_COARSE);
+		locationCriteria.setAltitudeRequired(false);
+		locationCriteria.setBearingRequired(false);
+		locationCriteria.setCostAllowed(true);
+		locationCriteria.setSpeedRequired(false);
+		locationCriteria.setPowerRequirement(Criteria.POWER_LOW);
 
-  private boolean setLocationFromIP() {	  
-	  String url = "http://api.hostip.info/get_html.php?position=true";
-	  String data = IO.getURLFile(url);
+		String locationProvider = locationManager.getBestProvider(locationCriteria, true);
+		if (locationProvider == null) {
+			Log.w(TAG, "No location provider is enabled");
 
-	  try {
-		  Log.v(TAG, ""+data);
-		  
-		  Pattern p = Pattern.compile("Latitude:\\s+([-.0-9]+)");
-		  Matcher m = p.matcher(data);
-		  if (!m.find())
-			  return false;
-		  float latitude = Float.parseFloat(m.group(1));
-		  p = Pattern.compile("Longitude:\\s+([-.0-9]+)");
-		  m = p.matcher(data);
-		  if (!m.find())
-			  return false;
-		  float longitude = Float.parseFloat(m.group(1));
-		  
-		  Log.v(TAG, "From "+url+" got "+latitude+" "+longitude);
-		  
-		  LatLong myPosition = new LatLong(latitude, longitude);
+			if (!setLocationFromIP()) {
+				Toast.makeText(context, R.string.location_no_auto, Toast.LENGTH_LONG).show();
+				setLocationFromPrefs();
+			}
 
-		  setLocationInModel(myPosition, url);
-		  showLocationToUser(myPosition, url);
-		  
-		  return true;
-	  }
-	  catch (NumberFormatException e) {
-		  return false;
-	  }
-  }
+			String possiblelocationProvider = locationManager.getBestProvider(locationCriteria, false);
+			if (possiblelocationProvider != null) {
+				Log.w(TAG, "No possible location provider.");
+				return;
+			}
 
-private void setLocationInModel(LatLong location, String provider) {
-    LatLong oldLocation = model.getLocation();
-    if (location.distanceFrom(oldLocation) > MIN_DIST_TO_SHOW_TOAST_DEGS) {
-      Log.d(TAG, "Informing user of change of location");
-      showLocationToUser(location, provider);
-    } else {
-      Log.d(TAG, "Location not changed sufficiently to tell the user");
-    }
-    model.setLocation(location);
-  }
+			//      if (!OsVersions.isKindle()) {
+			//    	  /* Won't bother with this dialog.  But Kindle Fire 1 users should bug Amazon 
+			//    	   * about the impossibility of activating a location provider.
+			//    	   */
+			AlertDialog.Builder alertDialog = getSwitchOnGPSDialog();
+			alertDialog.show();
+			//      }
+			return;
+		} else {
+			Log.d(TAG, "Got location provider " + locationProvider);
+		}
 
-  private Builder getSwitchOnGPSDialog() {
-    AlertDialog.Builder dialog = new AlertDialog.Builder(context);
-    dialog.setTitle(R.string.location_offer_to_enable_gps_title);
-    dialog.setMessage(R.string.location_offer_to_enable);
-    dialog.setPositiveButton(android.R.string.yes, new OnClickListener() {
-      public void onClick(DialogInterface dialog, int which) {
-        Log.d(TAG, "Sending to editor location prefs page");
-        Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-        context.startActivity(intent);
-      }
-    });
-    dialog.setNegativeButton(android.R.string.no, new OnClickListener() {
-      public void onClick(DialogInterface dialog, int which) {
-        Log.d(TAG, "User doesn't want to enable location.");
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        Editor editor = prefs.edit();
-        editor.putBoolean(NO_AUTO_LOCATE, true);
-        editor.commit();
-        setLocationFromPrefs();
-      }
-    });
-    return dialog;
-  }
+		locationManager.requestLocationUpdates(locationProvider, LOCATION_UPDATE_TIME_MILLISECONDS,
+				MINIMUM_DISTANCE_BEFORE_UPDATE_METRES,
+				this);
 
-  private void setLocationFromPrefs() {
-    String longitude_s = PreferenceManager.getDefaultSharedPreferences(context)
-                                          .getString("longitude", "");
-    String latitude_s = PreferenceManager.getDefaultSharedPreferences(context)
-                                         .getString("latitude", "");
+		Location location = locationManager.getLastKnownLocation(locationProvider);
+		if (location != null) {
+			LatLong myLocation = new LatLong(location.getLatitude(), location.getLongitude());
+			setLocationInModel(myLocation, location.getProvider());
+		}
+		else {
+			Log.e(TAG, "No last known location");
+			if (!setLocationFromIP()) {
+				Toast.makeText(context, R.string.location_no_auto, Toast.LENGTH_LONG).show();
+				setLocationFromPrefs();
+			}
+		}
+	}
 
-    float longitude = -80, latitude = 40;
-    try {
-      longitude = Float.parseFloat(longitude_s);
-      latitude = Float.parseFloat(latitude_s);
-    } catch (NumberFormatException nfe) {
-      Log.e(TAG, "Error parsing latitude or longitude preference");
-      Toast.makeText(context, R.string.malformed_loc_error, Toast.LENGTH_SHORT).show();
-    }
+	private boolean setLocationFromIP() {	  
+		String url = "http://api.hostip.info/get_html.php?position=true";
+		String data = IO.getURLFile(url);
 
-    Location location = new Location(context.getString(R.string.preferences));
-    location.setLatitude(latitude);
-    location.setLongitude(longitude);
+		try {
+			Log.v(TAG, ""+data);
 
-    Log.d(TAG, "Latitude " + longitude);
-    Log.d(TAG, "Longitude " + latitude);
-    LatLong myPosition = new LatLong(latitude, longitude);
-    setLocationInModel(myPosition, context.getString(R.string.preferences));
-  }
+			Pattern p = Pattern.compile("Latitude:\\s+([-.0-9]+)");
+			Matcher m = p.matcher(data);
+			if (!m.find())
+				return false;
+			float latitude = Float.parseFloat(m.group(1));
+			p = Pattern.compile("Longitude:\\s+([-.0-9]+)");
+			m = p.matcher(data);
+			if (!m.find())
+				return false;
+			float longitude = Float.parseFloat(m.group(1));
 
-  @Override
-  public void stop() {
-    Log.d(TAG, "LocationController stop");
+			Log.v(TAG, "From "+url+" got "+latitude+" "+longitude);
 
-    if (locationManager == null) {
-      return;
-    }
-    locationManager.removeUpdates(this);
+			LatLong myPosition = new LatLong(latitude, longitude);
 
-    Log.d(TAG, "LocationController -stop");
-  }
+			setLocationInModel(myPosition, url);
+			showLocationToUser(myPosition, url);
 
-  @Override
-  public void onLocationChanged(Location location) {
-    Log.d(TAG, "LocationController onLocationChanged");
+			return true;
+		}
+		catch (NumberFormatException e) {
+			return false;
+		}
+	}
 
-    if (location == null) {
-      Log.e(TAG, "Didn't get location even though onLocationChanged called");
-      setLocationFromPrefs();
-      return;
-    }
+	private void setLocationInModel(LatLong location, String provider) {
+		LatLong oldLocation = model.getLocation();
+		if (location.distanceFrom(oldLocation) > MIN_DIST_TO_SHOW_TOAST_DEGS) {
+			Log.d(TAG, "Informing user of change of location");
+			showLocationToUser(location, provider);
+		} else {
+			Log.d(TAG, "Location not changed sufficiently to tell the user");
+		}
+		model.setLocation(location);
+	}
 
-    LatLong newLocation = new LatLong(location.getLatitude(), location.getLongitude());
+	private Builder getSwitchOnGPSDialog() {
+		AlertDialog.Builder dialog = new AlertDialog.Builder(context);
+		dialog.setTitle(R.string.location_offer_to_enable_gps_title);
+		dialog.setMessage(R.string.location_offer_to_enable);
+		dialog.setPositiveButton(android.R.string.yes, new OnClickListener() {
+			public void onClick(DialogInterface dialog, int which) {
+				Log.d(TAG, "Sending to editor location prefs page");
+				Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+				context.startActivity(intent);
+			}
+		});
+		dialog.setNegativeButton(android.R.string.no, new OnClickListener() {
+			public void onClick(DialogInterface dialog, int which) {
+				Log.d(TAG, "User doesn't want to enable location.");
+				SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+				Editor editor = prefs.edit();
+				editor.putBoolean(NO_AUTO_LOCATE, true);
+				editor.commit();
+				setLocationFromPrefs();
+			}
+		});
+		return dialog;
+	}
 
-    Log.d(TAG, "Latitude " + newLocation.latitude);
-    Log.d(TAG, "Longitude " + newLocation.longitude);
-    setLocationInModel(newLocation, location.getProvider());
+	private void setLocationFromPrefs() {
+		String longitude_s = PreferenceManager.getDefaultSharedPreferences(context)
+				.getString("longitude", "");
+		String latitude_s = PreferenceManager.getDefaultSharedPreferences(context)
+				.getString("latitude", "");
 
-    // Only need get the location once.
-    locationManager.removeUpdates(this);
+		float longitude = -80, latitude = 40;
+		try {
+			longitude = Float.parseFloat(longitude_s);
+			latitude = Float.parseFloat(latitude_s);
+		} catch (NumberFormatException nfe) {
+			Log.e(TAG, "Error parsing latitude or longitude preference");
+			Toast.makeText(context, R.string.malformed_loc_error, Toast.LENGTH_LONG).show();
+		}
 
-    Log.d(TAG, "LocationController -onLocationChanged");
-  }
+		Location location = new Location(context.getString(R.string.preferences));
+		location.setLatitude(latitude);
+		location.setLongitude(longitude);
 
-  private void showLocationToUser(LatLong location, String provider) {
-    // TODO(johntaylor): move this notification to a separate thread)
-    Log.d(TAG, "Reverse geocoding location");
-    Geocoder geoCoder = new Geocoder(context);
-    List<Address> addresses = new ArrayList<Address>();
-    String place = "Unknown";
-    try {
-      addresses = geoCoder.getFromLocation(location.latitude, location.longitude, 1);
-    } catch (IOException e) {
-      Log.e(TAG, "Unable to reverse geocode location " + location);
-    }
+		Log.d(TAG, "Latitude " + longitude);
+		Log.d(TAG, "Longitude " + latitude);
+		LatLong myPosition = new LatLong(latitude, longitude);
+		setLocationInModel(myPosition, context.getString(R.string.preferences));
+	}
 
-    if (addresses == null || addresses.size() == 0) {
-      Log.d(TAG, "No addresses returned");
-      place = String.format(context.getString(R.string.location_long_lat), location.longitude,
-          location.latitude);
-    } else {
-      place = getSummaryOfPlace(location, addresses.get(0));
-    }
+	@Override
+	public void stop() {
+		Log.d(TAG, "LocationController stop");
 
-    Log.d(TAG, "Location set to " + place);
+		if (locationManager == null) {
+			return;
+		}
+		locationManager.removeUpdates(this);
 
-    String messageTemplate = context.getString(R.string.location_set_auto);
-    String message = String.format(messageTemplate, provider, place);
-    Toast.makeText(context, message, Toast.LENGTH_LONG).show();
-  }
+		Log.d(TAG, "LocationController -stop");
+	}
 
-  private String getSummaryOfPlace(LatLong location, Address address) {
-    String template = context.getString(R.string.location_long_lat);
-    String longLat = String.format(template, location.longitude, location.latitude);
-    if (address == null) {
-      return longLat;
-    }
-    String place = null;
-    place = address.getLocality();
-    if (place == null) {
-      place = address.getSubAdminArea();
-    }
-    if (place == null) {
-      place = address.getAdminArea();
-    }
-    if (place == null) {
-      place = longLat;
-    }
-    return place;
-  }
+	@Override
+	public void onLocationChanged(Location location) {
+		Log.d(TAG, "LocationController onLocationChanged");
 
-  @Override
-  public void onProviderDisabled(String provider) {
-    // No action.
-  }
+		if (location == null) {
+			Log.e(TAG, "Didn't get location even though onLocationChanged called");
+			setLocationFromPrefs();
+			return;
+		}
 
-  @Override
-  public void onProviderEnabled(String provider) {
-    // No action.
-  }
+		LatLong newLocation = new LatLong(location.getLatitude(), location.getLongitude());
 
-  @Override
-  public void onStatusChanged(String provider, int status, Bundle extras) {
-    // No action.
-  }
+		Log.d(TAG, "Latitude " + newLocation.latitude);
+		Log.d(TAG, "Longitude " + newLocation.longitude);
+		setLocationInModel(newLocation, location.getProvider());
+
+		// Only need get the location once.
+		locationManager.removeUpdates(this);
+
+		Log.d(TAG, "LocationController -onLocationChanged");
+	}
+
+	private void showLocationToUser(LatLong location, String provider) {
+		// TODO(johntaylor): move this notification to a separate thread)
+		Log.d(TAG, "Reverse geocoding location");
+		Geocoder geoCoder = new Geocoder(context);
+		List<Address> addresses = new ArrayList<Address>();
+		String place = "Unknown";
+		try {
+			addresses = geoCoder.getFromLocation(location.latitude, location.longitude, 1);
+		} catch (IOException e) {
+			Log.e(TAG, "Unable to reverse geocode location " + location);
+		}
+
+		if (addresses == null || addresses.size() == 0) {
+			Log.d(TAG, "No addresses returned");
+			place = String.format(context.getString(R.string.location_long_lat), location.longitude,
+					location.latitude);
+		} else {
+			place = getSummaryOfPlace(location, addresses.get(0));
+		}
+
+		Log.d(TAG, "Location set to " + place);
+
+		String messageTemplate = context.getString(R.string.location_set_auto);
+		String message = String.format(messageTemplate, provider, place);
+		Toast.makeText(context, message, Toast.LENGTH_LONG).show();
+	}
+
+	private String getSummaryOfPlace(LatLong location, Address address) {
+		String template = context.getString(R.string.location_long_lat);
+		String longLat = String.format(template, location.longitude, location.latitude);
+		if (address == null) {
+			return longLat;
+		}
+		String place = null;
+		place = address.getLocality();
+		if (place == null) {
+			place = address.getSubAdminArea();
+		}
+		if (place == null) {
+			place = address.getAdminArea();
+		}
+		if (place == null) {
+			place = longLat;
+		}
+		return place;
+	}
+
+	@Override
+	public void onProviderDisabled(String provider) {
+		// No action.
+	}
+
+	@Override
+	public void onProviderEnabled(String provider) {
+		// No action.
+	}
+
+	@Override
+	public void onStatusChanged(String provider, int status, Bundle extras) {
+		// No action.
+	}
 }

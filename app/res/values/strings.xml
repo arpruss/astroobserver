@@ -74,6 +74,8 @@ rebuilding the object data -->
     <string name="other" translation_description="A preference category (ie preferences that don't belong in any other category)">Other</string>
     <string name="planetary_images">Show Planet Images</string>
     <string name="menu_time" >Time Travel</string>
+    <string name="share">AstroShare</string>
+    <string name="share_chooser">Which application to share position with?</string>
     <string name="time_travel_start_message" >Traveling through time ...</string>
     <string name="time_travel_start_message_alt" >Traveling through time to %s ...</string>
     <string name="time_travel_close_message" >Back to the present ...</string>

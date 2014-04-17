@@ -17,16 +17,21 @@ import mobi.omegacentauri.ao.R;
 import mobi.omegacentauri.ao.activities.util.ActivityLightLevelChanger;
 import mobi.omegacentauri.ao.activities.util.ActivityLightLevelManager;
 import mobi.omegacentauri.ao.util.MiscUtil;
+import mobi.omegacentauri.ao.util.OsVersions;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
+import android.content.res.ObbScanner;
 import android.location.Address;
 import android.location.Geocoder;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.EditTextPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
+import android.preference.PreferenceGroup;
 import android.preference.PreferenceManager;
 import android.preference.Preference.OnPreferenceChangeListener;
 import android.util.Log;
@@ -47,28 +52,36 @@ public class EditSettingsActivity extends PreferenceActivity {
   private static final String LATITUDE = "latitude";
   private static final String LOCATION = "location";
   private static final String TAG = MiscUtil.getTag(EditSettingsActivity.class);
+private static final CharSequence LOCATION_SETTINGS = "location_settings";
   private Geocoder geocoder;
   private ActivityLightLevelManager activityLightLevelManager;
 
-  @Override
+  @SuppressLint("NewApi")
+@Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     activityLightLevelManager = new ActivityLightLevelManager(
         new ActivityLightLevelChanger(this, null),
         PreferenceManager.getDefaultSharedPreferences(this));
-    geocoder = new Geocoder(this);
     addPreferencesFromResource(R.xml.preference_screen);
     Preference editPreference = findPreference(LOCATION);
-    // TODO(johntaylor) if the lat long prefs get changed manually, we should really
-    // reset the placename to "" too.
-    editPreference.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
-
-      public boolean onPreferenceChange(Preference preference, Object newValue) {
-        Log.d(TAG, "Place to be updated to " + newValue);
-        boolean success = setLatLongFromPlace(newValue.toString());
-        return success;
-      }
-    });
+    if ( OsVersions.isKindle1() || (Build.VERSION.SDK_INT >= 9 && ! Geocoder.isPresent())) {
+    	PreferenceGroup parent = (PreferenceGroup)findPreference(LOCATION_SETTINGS);
+    	parent.removePreference(editPreference);
+    }
+    else {
+    	geocoder = new Geocoder(this);
+	    // TODO(johntaylor) if the lat long prefs get changed manually, we should really
+	    // reset the placename to "" too.
+	    editPreference.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
+	
+	      public boolean onPreferenceChange(Preference preference, Object newValue) {
+	        Log.d(TAG, "Place to be updated to " + newValue);
+	        boolean success = setLatLongFromPlace(newValue.toString());
+	        return success;
+	      }
+	    });
+    }
   }
 
   @Override
@@ -103,7 +116,7 @@ public class EditSettingsActivity extends PreferenceActivity {
       addresses = geocoder.getFromLocationName(place, 1);
     } catch (IOException e) {
       Log.e(TAG, ""+e);
-      Toast.makeText(this, getString(R.string.location_unable_to_geocode), Toast.LENGTH_SHORT).show();
+      Toast.makeText(this, getString(R.string.location_unable_to_geocode), Toast.LENGTH_LONG).show();
       return false;
     }
     if (addresses.size() == 0) {

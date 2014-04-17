@@ -37,6 +37,17 @@ public class GeocentricCoordinates extends Vector3 {
   public void updateFromRaDec(RaDec raDec) {
     updateFromRaDec(raDec.ra, raDec.dec);
   }
+  
+  public float getRARadians() {
+	  if (Math.abs(this.z) > 1-1e-10)
+		  return 0;
+	  else
+		  return (float)Math.atan2(this.y, this.x);
+  }
+
+  public float getDecRadians() {
+	  return (float)Math.asin(this.z);
+  }
 
   private void updateFromRaDec(float ra, float dec) {
     float raRadians = ra * Geometry.DEGREES_TO_RADIANS;
