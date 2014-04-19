@@ -191,3 +191,4 @@ public class ManualOrientationController extends AbstractController {
 	  }
   }
 }
+

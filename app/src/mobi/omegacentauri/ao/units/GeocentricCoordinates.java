@@ -41,8 +41,11 @@ public class GeocentricCoordinates extends Vector3 {
   public float getRARadians() {
 	  if (Math.abs(this.z) > 1-1e-10)
 		  return 0;
-	  else
-		  return (float)Math.atan2(this.y, this.x);
+	  else {
+		  double ra = Math.atan2(this.y, this.x);
+		  if (ra < 0) ra += Math.PI * 2;
+		  return (float)ra;
+	  }
   }
 
   public float getDecRadians() {
@@ -57,6 +60,12 @@ public class GeocentricCoordinates extends Vector3 {
     this.y = FloatMath.sin(raRadians) * FloatMath.cos(decRadians);
     this.z = FloatMath.sin(decRadians);
   }
+
+  public void updateFromRaDecRadians(float raRadians, float decRadians) {
+	    this.x = FloatMath.cos(raRadians) * FloatMath.cos(decRadians);
+	    this.y = FloatMath.sin(raRadians) * FloatMath.cos(decRadians);
+	    this.z = FloatMath.sin(decRadians);
+	  }
 
   /**
    * Convert ra and dec to x,y,z where the point is place on the unit sphere.
