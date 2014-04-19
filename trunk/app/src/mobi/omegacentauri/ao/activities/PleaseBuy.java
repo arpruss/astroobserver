@@ -5,13 +5,40 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.Uri;
+import android.os.Build;
 
 public class PleaseBuy {
-	public static final String market = "Appstore";
+	public static final String APPSTORE = "Appstore";
+	public static final String MARKET = "Market";
+	
+	public static String detect(Context c) {
+		PackageManager pm = c.getPackageManager();
+				
+		String installer = pm.getInstallerPackageName(c.getPackageName());
+		
+		if (installer != null && installer.equals("com.android.vending")) 
+			return MARKET;
+		
+		if (Build.MODEL.equalsIgnoreCase("Kindle Fire")) 
+			return APPSTORE;
+
+		try {
+			if (pm.getPackageInfo("com.amazon.venezia", 0) != null) 
+				return APPSTORE;
+		} catch (NameNotFoundException e) {
+		}
+		
+		return MARKET;
+	}
+	
+
 	
 	public PleaseBuy(final Context c, boolean always) {
+		final String market = detect(c);
+		
 		if (!always) {
 			SharedPreferences p = c.getSharedPreferences("PleaseBuy", 0);
 			int v;

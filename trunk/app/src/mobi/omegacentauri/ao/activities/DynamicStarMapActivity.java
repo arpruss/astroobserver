@@ -82,6 +82,9 @@ import java.util.List;
  */
 public class DynamicStarMapActivity extends Activity implements OnSharedPreferenceChangeListener {
   private static final int TIME_DISPLAY_DELAY_MILLIS = 1000;
+  static public final String ASTROSHARE_RA = "RA";
+  static public final String ASTROSHARE_DEC = "Declination";
+  static public final String ASTROSHARE_SIZE = "Size";
 
   /**
    * Passed to the renderer to get per-frame updates from the model.
@@ -233,9 +236,23 @@ private MapMover mapMover;
       Log.d(TAG, "Started as a result of a search");
       doSearchWithIntent(intent);
     }
+    else if (Intent.ACTION_VIEW.equals(intent.getAction())) {
+    	point(intent);
+    }
 
 	new PleaseBuy(this, false);
     Log.d(TAG, "-onCreate at " + System.currentTimeMillis());
+  }
+  
+  void point(Intent intent) {
+	  	double ra2000 = intent.getDoubleExtra(ASTROSHARE_RA, 0.);
+	  	double dec2000 = intent.getDoubleExtra(ASTROSHARE_DEC, 0.);
+	  	double size = intent.getDoubleExtra(ASTROSHARE_SIZE, 2. * Math.PI / 180);
+	
+	  	GeocentricCoordinates coords = new GeocentricCoordinates(0f, 0f, 0f);
+	  	coords.updateFromRaDecRadians((float)ra2000, (float)dec2000);
+	  	controller.teleport(coords);
+	  	model.setFieldOfView((float)Math.toDegrees(size));
   }
 
   @Override
@@ -345,9 +362,10 @@ private MapMover mapMover;
     	i.setType("text/astro_position");
     	GeocentricCoordinates c = model.getPointing().getLineOfSight();
   
-    	i.putExtra("RA", (double)c.getRARadians());
-    	i.putExtra("Declination", (double)c.getDecRadians());
-    	i.putExtra("Size", (double)Math.toRadians((double)model.getFieldOfView()));
+    	Log.v(TAG, "RA:"+c.getRARadians());
+    	i.putExtra(ASTROSHARE_RA, (double)c.getRARadians());
+    	i.putExtra(ASTROSHARE_DEC, (double)c.getDecRadians());
+    	i.putExtra(ASTROSHARE_SIZE, (double)Math.toRadians((double)model.getFieldOfView()));
     	startActivity(Intent.createChooser(i, getString(R.string.share_chooser)));
     	break;
     case R.id.menu_item_time:
@@ -691,6 +709,9 @@ private void wireUpScreenControls() {
     Log.d(TAG, "New Intent received " + intent);
     if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
       doSearchWithIntent(intent);
+    }
+    else if (Intent.ACTION_VIEW.equals(intent.getAction())) {
+    	point(intent);
     }
   }
 
